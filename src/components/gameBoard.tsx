@@ -22,7 +22,7 @@ const GameBoard: React.FC<TProps> = ({board}) => {
         return row.map((cell, colIndex) => {
           return (
             <Button onClick={() => handleClickCell(rowIndex, colIndex)}
-                    className="w-12 h-12"
+                    size="xl"
                     variant="secondary"
                     disabled={cell !== CellValue.Empty}>
               {cell !== CellValue.Empty ? cell : null}
