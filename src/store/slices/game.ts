@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import {BOARD_SIZE} from "../../constants/game.ts";
+import { checkWinner } from "../../utils/checkWinner.ts";
+import {BOARD_MAX_SIZE, BOARD_MIN_SIZE} from "../../constants/game.ts";
 
 export enum CellValue {
   X = 'X',
@@ -8,7 +9,7 @@ export enum CellValue {
   Empty = 0
 }
 
-export enum GameStateEnum {
+export enum GameStatusEnum {
   NotStarted = 'Not Started',
   InProgress = 'In Progress',
   Draw = 'Draw',
@@ -21,18 +22,19 @@ export type Board = CellValue[][];
 interface GameState {
   history: Board[];
   currentMoveIndex: number;
-  gameStatus: GameStateEnum;
+  gameStatus: GameStatusEnum;
+  boardSize: number;
 }
 
-
-const createInitialBoard = (): Board => {
-  return Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(CellValue.Empty));
+const createInitialBoard = (size: number): Board => {
+  return Array.from({ length: size }, () => Array(size).fill(CellValue.Empty));
 }
 
 const initialState: GameState = {
-  history: [createInitialBoard()],
+  history: [createInitialBoard(3)],
   currentMoveIndex: 0,
-  gameStatus: GameStateEnum.NotStarted,
+  gameStatus: GameStatusEnum.NotStarted,
+  boardSize: 3,
 };
 
 const gameSlice = createSlice({
@@ -40,14 +42,14 @@ const gameSlice = createSlice({
   initialState,
   reducers: {
     setCell: (state, action: PayloadAction<{ rowIndex: number; colIndex: number }>) => {
-      if (state.gameStatus === GameStateEnum.NotStarted || state.gameStatus === GameStateEnum.InProgress) {
+      if (state.gameStatus === GameStatusEnum.NotStarted || state.gameStatus === GameStatusEnum.InProgress) {
         const { rowIndex, colIndex } = action.payload;
         const currentBoard = state.history[state.currentMoveIndex].map(row => [...row]);
         const isXTurn = (state.currentMoveIndex % 2) === 0;
         if (currentBoard[rowIndex][colIndex] === CellValue.Empty) {
           currentBoard[rowIndex][colIndex] = isXTurn ? CellValue.X : CellValue.O;
-          // Update the game state to In Progress
-          state.gameStatus = GameStateEnum.InProgress;
+          // Update the game state
+          state.gameStatus = checkWinner(currentBoard);
           // Cut the history if we are in the middle and make a new move
           const newHistory = state.history.slice(0, state.currentMoveIndex + 1);
           newHistory.push(currentBoard);
@@ -59,27 +61,37 @@ const gameSlice = createSlice({
     undo: (state) => {
       if (state.currentMoveIndex > 0) {
         state.currentMoveIndex--;
-        state.gameStatus = GameStateEnum.InProgress;
+        state.gameStatus = checkWinner(state.history[state.currentMoveIndex]);
       }
     },
     redo: (state) => {
       if (state.currentMoveIndex < state.history.length - 1) {
         state.currentMoveIndex++;
-        state.gameStatus = GameStateEnum.InProgress;
+        state.gameStatus = checkWinner(state.history[state.currentMoveIndex]);
       }
     },
     resetGame: (state) => {
-      state.history = [createInitialBoard()];
+      state.history = [createInitialBoard(state.boardSize)];
       state.currentMoveIndex = 0;
-      state.gameStatus = GameStateEnum.NotStarted;
+      state.gameStatus = GameStatusEnum.NotStarted;
     },
     startGame: (state) => {
-      state.gameStatus = GameStateEnum.InProgress;
-    }
+      state.gameStatus = GameStatusEnum.InProgress;
+    },
+    setBoardSize: (state, action: PayloadAction<number>) => {
+      if (state.gameStatus === GameStatusEnum.NotStarted) {
+        const size = action.payload;
+        if (size >= BOARD_MIN_SIZE && size <= BOARD_MAX_SIZE) {
+          state.boardSize = size;
+          state.history = [createInitialBoard(size)];
+          state.currentMoveIndex = 0;
+        }
+      }
+    },
   },
 });
 
-export const { setCell, undo, redo, resetGame, startGame } = gameSlice.actions;
+export const { setCell, undo, redo, resetGame, startGame, setBoardSize } = gameSlice.actions;
 
 const selectGameState = (state: RootState) => state.game;
 
@@ -100,5 +112,8 @@ export const selectCurrentBoard = createSelector(
 
 export const selectGameStatus = (state: RootState) =>
   state.game.gameStatus;
+
+export const selectBoardSize = (state: RootState) =>
+  state.game.boardSize;
 
 export const gameReducer = gameSlice.reducer;

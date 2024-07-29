@@ -3,15 +3,19 @@ import {useSelector} from "react-redux";
 import GameBoard from "../components/gameBoard.tsx";
 import React from "react";
 import Toolbar from "../components/toolbar.tsx";
+import BoardSizeControls from "../components/boardSizeControls.tsx";
 
 const Game: React.FC = () => {
   const currentBoard = useSelector(selectCurrentBoard)
 
   return (
-    <div className='w-full h-screen flex items-center justify-center'>
+    <>
       <Toolbar/>
-      <GameBoard board={currentBoard}></GameBoard>
-    </div>
+      <BoardSizeControls/>
+      <div className='w-full h-screen flex flex-col items-center justify-center'>
+        <GameBoard board={currentBoard}></GameBoard>
+      </div>
+    </>
   );
 };
 
