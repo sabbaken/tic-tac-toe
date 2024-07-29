@@ -15,7 +15,7 @@ const buttonVariants = cva(
         outline:
           "border border-stone-200 bg-white hover:bg-stone-100 hover:text-stone-900",
         secondary:
-          "bg-stone-100 text-stone-900 hover:bg-stone-100/80",
+          "bg-stone-100 text-black-800 hover:bg-stone-100/80",
         ghost: "hover:bg-stone-100 hover:text-stone-900",
         link: "text-stone-900 underline-offset-4 hover:underline",
       },
@@ -41,7 +41,7 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({className, variant, size, asChild = false, ...props}, ref) => {
+  ({className, variant = "default", size, asChild = false, ...props}, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp

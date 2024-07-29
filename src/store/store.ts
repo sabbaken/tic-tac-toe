@@ -1,7 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {gameReducer} from "./slices/game.ts";
 
-export const store = configureStore({
+export const store: any = configureStore({
   reducer: {
     game: gameReducer,
   },
