@@ -60,6 +60,18 @@ const gameSlice = createSlice({
         }
       }
     },
+    undo: (state) => {
+      if (state.currentMoveIndex > 0) {
+        state.currentMoveIndex--;
+        state.gameStatus = GameStateEnum.InProgress;
+      }
+    },
+    redo: (state) => {
+      if (state.currentMoveIndex < state.history.length - 1) {
+        state.currentMoveIndex++;
+        state.gameStatus = GameStateEnum.InProgress;
+      }
+    },
     resetGame: (state) => {
       state.history = [createInitialBoard()];
       state.currentMoveIndex = 0;
