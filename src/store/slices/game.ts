@@ -1,20 +1,20 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../store';
-import { checkWinner } from "../../utils/checkWinner.ts";
+import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {RootState} from "../store";
+import {checkWinner} from "../../utils/checkWinner.ts";
 import {BOARD_MAX_SIZE, BOARD_MIN_SIZE} from "../../constants/game.ts";
 
 export enum CellValue {
-  X = 'X',
-  O = 'O',
+  X = "X",
+  O = "O",
   Empty = 0
 }
 
 export enum GameStatusEnum {
-  NotStarted = 'Not Started',
-  InProgress = 'In Progress',
-  Draw = 'Draw',
-  WinX = 'Win for X',
-  WinO = 'Win for O'
+  NotStarted = "Not Started",
+  InProgress = "In Progress",
+  Draw = "Draw",
+  WinX = "Win for X",
+  WinO = "Win for O"
 }
 
 export type Board = CellValue[][];
@@ -27,8 +27,8 @@ interface GameState {
 }
 
 const createInitialBoard = (size: number): Board => {
-  return Array.from({ length: size }, () => Array(size).fill(CellValue.Empty));
-}
+  return Array.from({length: size}, () => Array(size).fill(CellValue.Empty));
+};
 
 const initialState: GameState = {
   history: [createInitialBoard(3)],
@@ -38,12 +38,12 @@ const initialState: GameState = {
 };
 
 const gameSlice = createSlice({
-  name: 'game',
+  name: "game",
   initialState,
   reducers: {
-    setCell: (state, action: PayloadAction<{ rowIndex: number; colIndex: number }>) => {
+    setCell: (state, action: PayloadAction<{rowIndex: number; colIndex: number}>) => {
       if (state.gameStatus === GameStatusEnum.NotStarted || state.gameStatus === GameStatusEnum.InProgress) {
-        const { rowIndex, colIndex } = action.payload;
+        const {rowIndex, colIndex} = action.payload;
         const currentBoard = state.history[state.currentMoveIndex].map(row => [...row]);
         const isXTurn = (state.currentMoveIndex % 2) === 0;
         if (currentBoard[rowIndex][colIndex] === CellValue.Empty) {
@@ -91,23 +91,23 @@ const gameSlice = createSlice({
   },
 });
 
-export const { setCell, undo, redo, resetGame, startGame, setBoardSize } = gameSlice.actions;
+export const {setCell, undo, redo, resetGame, startGame, setBoardSize} = gameSlice.actions;
 
 const selectGameState = (state: RootState) => state.game;
 
 const selectCurrentMoveIndex = createSelector(
   [selectGameState],
-  (game) => game.currentMoveIndex
+  (game) => game.currentMoveIndex,
 );
 
 const selectHistory = createSelector(
   [selectGameState],
-  (game) => game.history
+  (game) => game.history,
 );
 
 export const selectCurrentBoard = createSelector(
   [selectHistory, selectCurrentMoveIndex],
-  (history, currentMoveIndex) => history[currentMoveIndex]
+  (history, currentMoveIndex) => history[currentMoveIndex],
 );
 
 export const selectGameStatus = (state: RootState) =>

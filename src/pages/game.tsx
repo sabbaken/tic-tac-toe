@@ -7,14 +7,14 @@ import BoardSizeControls from "../components/boardSizeControls.tsx";
 import GameStatus from "../components/gameStatus.tsx";
 
 const Game: React.FC = () => {
-  const currentBoard = useSelector(selectCurrentBoard)
+  const currentBoard = useSelector(selectCurrentBoard);
 
   return (
     <>
-      <Toolbar/>
-      <BoardSizeControls/>
-      <div className='w-full h-screen flex flex-col items-center justify-center'>
-        <GameStatus/>
+      <Toolbar />
+      <BoardSizeControls />
+      <div className="w-full h-screen flex flex-col items-center justify-center">
+        <GameStatus />
         <GameBoard board={currentBoard}></GameBoard>
       </div>
     </>

@@ -1,4 +1,4 @@
-import {configureStore} from '@reduxjs/toolkit';
+import {configureStore} from "@reduxjs/toolkit";
 import {gameReducer} from "./slices/game.ts";
 
 export const store: any = configureStore({
